@@ -1,0 +1,14 @@
+version: '3.3'
+
+services:
+  dev:
+    platform: linux/arm64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 127.0.0.1:9922:22
+    volumes:
+      - .:/usr/src/app/
+    environment:
+      DEV: 'True'
