@@ -34,7 +34,7 @@ df.head()
 # %% Reduce down the size of the dataframe and then split by Small Area to minimise data accesses from the app
 reduced = df[['SA2011','iso_type','Travel Minutes','iso_centre_X','iso_centre_Y', 'geometry']]
 for sa in reduced['SA2011'].unique():
-    df[df['SA2011']==sa].to_file(f'{sa}.geojson', driver='GeoJSON')
+    reduced[reduced['SA2011']==sa].to_file(f'{sa}.geojson', driver='GeoJSON')
 
 # %%
 df.groupby('iso_type').count()
