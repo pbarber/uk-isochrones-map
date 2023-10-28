@@ -34,10 +34,24 @@ df.head()
 # %% Reduce down the size of the dataframe and then split by Small Area to minimise data accesses from the app
 reduced = df[['SA2011','iso_type','Travel Minutes','iso_centre_X','iso_centre_Y', 'geometry']]
 for sa in reduced['SA2011'].unique():
-    reduced[reduced['SA2011']==sa].to_file(f'{sa}.geojson', driver='GeoJSON')
+    original = reduced[reduced['SA2011']==sa]
+    min60 = original.loc[lambda df: df['Travel Minutes'] == 60, :].overlay(original.loc[lambda df: df['Travel Minutes'] == 45, :], how='difference')
+    min45 = original.loc[lambda df: df['Travel Minutes'] == 45, :].overlay(original.loc[lambda df: df['Travel Minutes'] == 30, :], how='difference')
+    min30 = original.loc[lambda df: df['Travel Minutes'] == 30, :].overlay(original.loc[lambda df: df['Travel Minutes'] == 15, :], how='difference')
+    min15 = original.loc[lambda df: df['Travel Minutes'] == 15, :]
+    pandas.concat([min60, min45, min30, min15]).to_file(f'{sa}.geojson', driver='GeoJSON')
 
 # %%
 df.groupby('iso_type').count()
 
 # %%
-df[df['SA2011']=='N00000897'].to_file('N00000897.geojson', driver='GeoJSON')
+original = reduced[reduced['SA2011']=='N00000897']
+min60 = original.loc[lambda df: df['Travel Minutes'] == 60, :].overlay(original.loc[lambda df: df['Travel Minutes'] == 45, :], how='difference')
+min45 = original.loc[lambda df: df['Travel Minutes'] == 45, :].overlay(original.loc[lambda df: df['Travel Minutes'] == 30, :], how='difference')
+min30 = original.loc[lambda df: df['Travel Minutes'] == 30, :].overlay(original.loc[lambda df: df['Travel Minutes'] == 15, :], how='difference')
+min15 = original.loc[lambda df: df['Travel Minutes'] == 15, :]
+pandas.concat([min60, min45, min30, min15]).to_file('N00000897.geojson', driver='GeoJSON')
+
+
+
+# %%
