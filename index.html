@@ -1,13 +1,13 @@
 <html>
   <head>
     <!-- leaflet -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   
     <!-- deck.gl standalone bundle -->
     <script src="https://unpkg.com/deck.gl@^8.8.0/dist.min.js"></script>
     <!-- deck.gl-leaflet -->
-    <script src="https://unpkg.com/deck.gl-leaflet@1.1.1/dist/deck.gl-leaflet.min.js"></script>
+    <script src="https://unpkg.com/deck.gl-leaflet@1.2.1/dist/deck.gl-leaflet.min.js"></script>
 
     <style>
       #map {
@@ -44,7 +44,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-const colours = {60: [242, 240, 247], 45: [203, 201, 226], 30: [158, 154, 200], 15: [106, 81, 163]}
+const colours = {15: [242, 240, 247, 200], 30: [203, 201, 226, 200], 45: [158, 154, 200, 200], 60: [106, 81, 163, 200]}
 
 fetch(test_url)
 .then(res => res.json())
@@ -58,20 +58,20 @@ fetch(test_url)
     ],
     layers: [
         new deck.GeoJsonLayer({
-        id: 'isochrones',
-        data: out,
-        // Styles
-        filled: true,
-        pointRadiusMinPixels: 2,
-        pointRadiusScale: 2000,
-        getFillColor: f => colours[f.properties['Travel Minutes']]
+            id: 'isochrones',
+            data: out,
+            // Styles
+            filled: true,
+            getFillColor: f => colours[f.properties['Travel Minutes']]
         }),
     ],
     });
     map.addLayer(deckLayer);
 
     const featureGroup = L.featureGroup();
-    featureGroup.addLayer(L.marker([51.4709959, -0.4531566]));
+    const marker = L.marker([out.features[0].properties.iso_centre_Y, out.features[0].properties.iso_centre_X], title='Hi');
+    marker.bindTooltip(out.features[0].properties.SA2011).openTooltip();
+    featureGroup.addLayer(marker);
     map.addLayer(featureGroup);
 }
 )
