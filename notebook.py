@@ -32,12 +32,17 @@ df['iso_centre_Y'] = df.apply(get_iso_centre, axis=1, dim='Y')
 df.head()
 
 # %% Reduce down the size of the dataframe and then split by Small Area to minimise data accesses from the app
+def get_difference(a, b):
+    if a.geometry.isna().all() or b.geometry.isna().all():
+        return a
+    return a.overlay(b, how='difference')
+
 reduced = df[['SA2011','iso_type','Travel Minutes','iso_centre_X','iso_centre_Y', 'geometry']]
 for sa in reduced['SA2011'].unique():
     original = reduced[reduced['SA2011']==sa]
-    min60 = original.loc[lambda df: df['Travel Minutes'] == 60, :].overlay(original.loc[lambda df: df['Travel Minutes'] == 45, :], how='difference')
-    min45 = original.loc[lambda df: df['Travel Minutes'] == 45, :].overlay(original.loc[lambda df: df['Travel Minutes'] == 30, :], how='difference')
-    min30 = original.loc[lambda df: df['Travel Minutes'] == 30, :].overlay(original.loc[lambda df: df['Travel Minutes'] == 15, :], how='difference')
+    min60 = get_difference(original.loc[lambda df: df['Travel Minutes'] == 60, :], original.loc[lambda df: df['Travel Minutes'] == 45, :])
+    min45 = get_difference(original.loc[lambda df: df['Travel Minutes'] == 45, :], original.loc[lambda df: df['Travel Minutes'] == 30, :])
+    min30 = get_difference(original.loc[lambda df: df['Travel Minutes'] == 30, :], original.loc[lambda df: df['Travel Minutes'] == 15, :])
     min15 = original.loc[lambda df: df['Travel Minutes'] == 15, :]
     pandas.concat([min60, min45, min30, min15]).to_file(f'{sa}.geojson', driver='GeoJSON')
 
