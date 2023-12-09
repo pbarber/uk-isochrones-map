@@ -3,11 +3,13 @@
     <!-- leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
     <!-- deck.gl standalone bundle -->
     <script src="https://unpkg.com/deck.gl@^8.8.0/dist.min.js"></script>
     <!-- deck.gl-leaflet -->
     <script src="https://unpkg.com/deck.gl-leaflet@1.2.1/dist/deck.gl-leaflet.min.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <style>
       #map {
@@ -120,12 +122,23 @@ fetch(test_url)
     ],
     });
     map.addLayer(deckLayer);
+    map.zoomControl.setPosition('topright');
 
     const featureGroup = L.featureGroup();
     const marker = L.marker([out.features[0].properties.iso_centre_Y, out.features[0].properties.iso_centre_X], title='Hi');
     marker.bindTooltip(out.features[0].properties.SA2011).openTooltip();
     featureGroup.addLayer(marker);
     map.addLayer(featureGroup);
+    L.Control.geocoder({
+        defaultMarkGeocode: false,
+        position: 'topleft'
+      })
+      .on('markgeocode', function(e) {
+        console.log(e);
+        marker.bindTooltip(e.geocode.name).openTooltip();
+        marker.setLatLng(e.geocode.center);
+      })
+      .addTo(map);
 }
 )
 .catch(err => { throw err });
