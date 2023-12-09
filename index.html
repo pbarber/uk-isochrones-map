@@ -17,12 +17,12 @@
         width: 100vw;
         height: 100vh;
       }
-.leaflet-layer,
+/* .leaflet-layer,
 .leaflet-control-zoom-in,
 .leaflet-control-zoom-out,
 .leaflet-control-attribution {
   filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-}
+} */
 
 /*Legend specific*/
 .legend {
@@ -79,7 +79,9 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-const colours = {15: [242, 240, 247, 200], 30: [203, 201, 226, 200], 45: [158, 154, 200, 200], 60: [106, 81, 163, 200]}
+// Colours taken from MetColorBrewer Tam (colourblind safe)
+const opacity = 150;
+const colours = {15: [254, 203, 28, opacity], 30: [253, 105, 12, opacity], 45: [191, 0, 23, opacity], 60: [85, 0, 77, opacity]}
 
 /*Legend specific*/
 var legend = L.control({ position: "bottomleft" });
@@ -87,10 +89,10 @@ var legend = L.control({ position: "bottomleft" });
 legend.onAdd = function(map) {
   var div = L.DomUtil.create("div", "legend");
   div.innerHTML += "<h4>Area accessible in:</h4>";
-  div.innerHTML += '<i style="background: #f2f0f7"></i><span>15 minutes</span><br>';
-  div.innerHTML += '<i style="background: #cbc9e2"></i><span>30 minutes</span><br>';
-  div.innerHTML += '<i style="background: #9e9ac8"></i><span>45 minutes</span><br>';
-  div.innerHTML += '<i style="background: #6a51a3"></i><span>60 minutes</span><br>';
+  div.innerHTML += '<i style="background: rgb('.concat(colours['15'][0], ', ', colours['15'][1], ', ', colours['15'][2], ')"></i><span>15 minutes</span><br>');
+  div.innerHTML += '<i style="background: rgb('.concat(colours['30'][0], ', ', colours['30'][1], ', ', colours['30'][2], ')"></i><span>30 minutes</span><br>');
+  div.innerHTML += '<i style="background: rgb('.concat(colours['45'][0], ', ', colours['45'][1], ', ', colours['45'][2], ')"></i><span>45 minutes</span><br>');;
+  div.innerHTML += '<i style="background: rgb('.concat(colours['60'][0], ', ', colours['60'][1], ', ', colours['60'][2], ')"></i><span>60 minutes</span><br>');;
 
   return div;
 };
