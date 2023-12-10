@@ -44,4 +44,4 @@ To understand the Small Areas, I used [the NISRA Small Area Boundaries dataset](
 
 I used N00000897 as my test Small Area.
 
-
+To use the above Small Areas dataset in the app, I applied the conversion above in mapshaper, then simplified the file to 15% of the original.
