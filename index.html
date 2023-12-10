@@ -1,15 +1,16 @@
 <html>
   <head>
-    <!-- leaflet -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
+    <!-- leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- deck.gl standalone bundle -->
     <script src="https://unpkg.com/deck.gl@^8.8.0/dist.min.js"></script>
     <!-- deck.gl-leaflet -->
     <script src="https://unpkg.com/deck.gl-leaflet@1.2.1/dist/deck.gl-leaflet.min.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="https://cdn.rawgit.com/hayeswise/Leaflet.PointInPolygon/v1.0.0/wise-leaflet-pip.js"></script>
 
     <style>
       #map {
@@ -70,13 +71,16 @@
 
   <script type="text/javascript">
 
-const test_url =
-  'N00000897.geojson';
+const test_url = 'N00000897.geojson';
 
-  const map = L.map(document.getElementById('map'), {
-  center: [54.6, -6.5],
-  zoom: 9,
-});
+const map = L.map(
+  document.getElementById('map'), 
+  {
+    center: [54.6, -6.5],
+    zoom: 9,
+  }
+);
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
@@ -100,6 +104,23 @@ legend.onAdd = function(map) {
 };
 
 legend.addTo(map);
+
+let sa2011 = null;
+
+// Function to load JSON data from a URL
+function loadJson(url, callback) {
+    return fetch(url)
+        .then(response => response.json())
+        .then(data => callback(data))
+        .catch(error => console.error('Error loading JSON:', error));
+}
+
+// Function to load the first JSON data when the page loads
+window.onload = function() {
+    loadJson('sa2011_epsg4326_simplified15.json', function(data) {
+        sa2011 = L.geoJSON(data);
+    });
+};
 
 fetch(test_url)
 .then(res => res.json())
@@ -135,8 +156,19 @@ fetch(test_url)
       })
       .on('markgeocode', function(e) {
         console.log(e);
-        marker.bindTooltip(e.geocode.name).openTooltip();
-        marker.setLatLng(e.geocode.center);
+        var BreakException = {};
+        try {
+          sa2011.eachLayer(function(memberLayer) {
+          if (memberLayer.contains(e.geocode.center)) {
+            console.log(memberLayer.feature.properties.SA2011);
+            marker.bindTooltip(e.geocode.name.concat(': ', memberLayer.feature.properties.SA2011)).openTooltip();
+            marker.setLatLng(e.geocode.center);
+            throw BreakException;
+          }
+        });
+        } catch (ex) {
+          if (ex !== BreakException) throw ex;
+        }
       })
       .addTo(map);
 }
