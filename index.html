@@ -122,58 +122,55 @@ window.onload = function() {
     });
 };
 
-fetch(test_url)
-.then(res => res.json())
-.then(out => {
-    out.features.sort((a,b) => b.properties['Travel Minutes'] - a.properties['Travel Minutes']);
-    const deckLayer = new DeckGlLeaflet.LeafletLayer({
+const deckLayer = new DeckGlLeaflet.LeafletLayer({
     views: [
         new deck.MapView({
         repeat: true
         })
     ],
-    layers: [
-        new deck.GeoJsonLayer({
-            id: 'isochrones',
-            data: out,
-            // Styles
-            filled: true,
-            getFillColor: f => colours[f.properties['Travel Minutes']]
-        }),
-    ],
+    layers: [],
     });
-    map.addLayer(deckLayer);
-    map.zoomControl.setPosition('topright');
 
-    const featureGroup = L.featureGroup();
-    const marker = L.marker([out.features[0].properties.iso_centre_Y, out.features[0].properties.iso_centre_X], title='Hi');
-    marker.bindTooltip(out.features[0].properties.SA2011).openTooltip();
-    featureGroup.addLayer(marker);
-    map.addLayer(featureGroup);
-    L.Control.geocoder({
-        defaultMarkGeocode: false,
-        position: 'topleft'
-      })
-      .on('markgeocode', function(e) {
-        console.log(e);
-        var BreakException = {};
-        try {
-          sa2011.eachLayer(function(memberLayer) {
-          if (memberLayer.contains(e.geocode.center)) {
-            console.log(memberLayer.feature.properties.SA2011);
-            marker.bindTooltip(e.geocode.name.concat(': ', memberLayer.feature.properties.SA2011)).openTooltip();
-            marker.setLatLng(e.geocode.center);
-            throw BreakException;
-          }
+map.addLayer(deckLayer);
+
+map.zoomControl.setPosition('topright');
+
+const featureGroup = L.featureGroup();
+const marker = L.marker([0, 0]);
+featureGroup.addLayer(marker);
+map.addLayer(featureGroup);
+L.Control.geocoder({
+    defaultMarkGeocode: false,
+    position: 'topleft'
+  })
+  .on('markgeocode', function(e) {
+    var BreakException = {};
+    try {
+      sa2011.eachLayer(function(memberLayer) {
+      if (memberLayer.contains(e.geocode.center)) {
+        marker.bindTooltip(e.geocode.name.concat(': ', memberLayer.feature.properties.SA2011)).openTooltip();
+        marker.setLatLng(e.geocode.center);
+        loadJson(memberLayer.feature.properties.SA2011.concat('.geojson'), function(out) {
+          out.features.sort((a,b) => b.properties['Travel Minutes'] - a.properties['Travel Minutes']);
+          deckLayer.setProps({layers: [
+              new deck.GeoJsonLayer({
+                  id: 'isochrones',
+                  data: out,
+                  // Styles
+                  filled: true,
+                  getFillColor: f => colours[f.properties['Travel Minutes']]
+              }),
+          ],
+          });
         });
-        } catch (ex) {
-          if (ex !== BreakException) throw ex;
-        }
-      })
-      .addTo(map);
-}
-)
-.catch(err => { throw err });
+        throw BreakException;
+      }
+    });
+    } catch (ex) {
+      if (ex !== BreakException) throw ex;
+    }
+  })
+  .addTo(map);
 
 
 
