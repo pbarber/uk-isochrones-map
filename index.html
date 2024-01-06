@@ -80,8 +80,6 @@
 
   <script type="text/javascript">
 
-const test_url = 'N00000897.geojson';
-
 const map = L.map(
   document.getElementById('map'), 
   {
@@ -177,7 +175,7 @@ L.Control.geocoder({
       if (memberLayer.contains(e.geocode.center)) {
         info.update(e.geocode.name.split(','), memberLayer.feature.properties.SA2011);
         marker.setLatLng(e.geocode.center);
-        loadJson(memberLayer.feature.properties.SA2011.concat('.geojson'), function(out) {
+        loadJson('https://ni-travel-isochrones.s3.eu-west-2.amazonaws.com/'.concat(memberLayer.feature.properties.SA2011, '.geojson'), function(out) {
           out.features.sort((a,b) => b.properties['Travel Minutes'] - a.properties['Travel Minutes']);
           deckLayer.setProps({layers: [
               new deck.GeoJsonLayer({
