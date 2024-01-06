@@ -22,6 +22,16 @@ Resources:
       PublicAccessBlockConfiguration:
         BlockPublicPolicy: false
         RestrictPublicBuckets: false
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+            AllowedOrigins:
+              - "*"
+            ExposedHeaders:
+              - Access-Control-Allow-Origin
 
   StorageBucketPolicy:
     Type: AWS::S3::BucketPolicy
