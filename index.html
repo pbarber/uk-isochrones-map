@@ -39,7 +39,7 @@
   color: #555;
 }
 .legend h4 {
-  text-align: center;
+  text-align: left;
   font-size: 16px;
   margin: 2px 12px 8px;
   color: #777;
@@ -61,6 +61,15 @@
 .legend i.icon {
   background-size: 18px;
   background-color: rgba(255, 255, 255, 1);
+}
+
+.info {
+    padding: 6px 8px;
+    font: 14px/16px sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
 }
     </style>
   </head>
@@ -139,6 +148,24 @@ const featureGroup = L.featureGroup();
 const marker = L.marker([0, 0]);
 featureGroup.addLayer(marker);
 map.addLayer(featureGroup);
+
+var info = L.control({position: 'topleft'});
+
+info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+    this.update();
+    return this._div;
+};
+
+// method that we will use to update the control based on feature properties passed
+info.update = function (address, sa) {
+    this._div.innerHTML = (sa ?
+        '<b>' + address[0] + '</b><br />' + address[1] + '<br />' + address[2] + '<br />' + sa
+        : 'Search for a location in NI');
+};
+
+info.addTo(map);
+
 L.Control.geocoder({
     defaultMarkGeocode: false,
     position: 'topleft'
@@ -148,7 +175,7 @@ L.Control.geocoder({
     try {
       sa2011.eachLayer(function(memberLayer) {
       if (memberLayer.contains(e.geocode.center)) {
-        marker.bindTooltip(e.geocode.name.concat(': ', memberLayer.feature.properties.SA2011)).openTooltip();
+        info.update(e.geocode.name.split(','), memberLayer.feature.properties.SA2011);
         marker.setLatLng(e.geocode.center);
         loadJson(memberLayer.feature.properties.SA2011.concat('.geojson'), function(out) {
           out.features.sort((a,b) => b.properties['Travel Minutes'] - a.properties['Travel Minutes']);
