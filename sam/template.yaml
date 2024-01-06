@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  ni-travel-app
+
+  Sample SAM Template for ni-travel-app
+
+Globals:
+  Function:
+    Timeout: 3
+
+Parameters:
+  StorageBucketName:
+    Type: String
+    Default: ni-travel-isochrones
+
+Resources:
+  StorageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref StorageBucketName    
+      PublicAccessBlockConfiguration:
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+
+  StorageBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: "StorageBucket"
+      PolicyDocument:
+        Statement:
+          - Action:
+              - "s3:GetObject"
+            Effect: "Allow"
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:s3:::"
+                  - Ref: "StorageBucket"
+                  - "/*"
+            Principal: "*"
+
+Outputs:
+  StorageBucketName:
+    Value: !Ref StorageBucketName
+    Description: S3 Bucket for data storage
