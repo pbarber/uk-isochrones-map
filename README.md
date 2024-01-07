@@ -14,7 +14,7 @@ The travel areas are limited to 4537 starting locations (green markers). In rura
 
 You may get better results by searching for locations on the opposite side of your initial search from the green marker.
 
-## Datasets
+## Datasets
 
 The app makes use of two open datasets:
 
