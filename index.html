@@ -73,6 +73,10 @@
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     border-radius: 5px;
 }
+
+.fa-map-marker {
+  color: rgba(32, 106, 190, 1);
+}
     </style>
   </head>
 
@@ -147,6 +151,16 @@ map.zoomControl.setPosition('topright');
 const featureGroup = L.featureGroup();
 const marker = L.marker([0, 0]);
 featureGroup.addLayer(marker);
+var greenIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+const marker2 = L.marker([0, 0], {icon: greenIcon});
+featureGroup.addLayer(marker2);
 map.addLayer(featureGroup);
 
 var info = L.control({position: 'topleft'});
@@ -160,7 +174,7 @@ info.onAdd = function (map) {
 // method that we will use to update the control based on feature properties passed
 info.update = function (address, sa) {
     this._div.innerHTML = (sa ?
-        '<b>' + address[0] + '</b><br />' + address[1] + '<br />' + address[2] + '<br />' + sa
+        '<b>' + address[0].trim() + '</b>&ensp;<i class="fa fa-map-marker"></i><br />' + address[1].trim() + '<br />' + address[2].trim() + '<br />' + sa
         : '<b>Click <i class="fa fa-search"></i> below to search for a location</b><br />The map will show areas you can reach from the location using public transport<br /><a href="https://github.com/pbarber/ni-travel-app/blob/main/README.md">More information</a>');
 };
 
@@ -189,6 +203,8 @@ L.Control.geocoder({
               }),
           ],
           });
+          console.log(out.features[0].properties);
+          marker2.setLatLng([out.features[0].properties.iso_centre_Y, out.features[0].properties.iso_centre_X]);
         });
         throw BreakException;
       }
