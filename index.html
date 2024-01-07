@@ -93,8 +93,12 @@ html, body, #map {
     border-radius: 5px;
 }
 
-.fa-map-marker {
+.search-marker {
   color: rgba(32, 106, 190, 1);
+}
+
+.start-marker {
+  color: rgba(36, 161, 26, 1);
 }
     </style>
   </head>
@@ -203,7 +207,7 @@ info.onAdd = function (map) {
 // method that we will use to update the control based on feature properties passed
 info.update = function (address, sa) {
     var content = (sa ?
-        '<b>' + address[0].trim() + '</b>&ensp;<i class="fa fa-map-marker"></i><br />' + address[1].trim() + '<br />' + address[2].trim() + '<br />' + sa
+        '<b>' + address[0].trim() + '</b>&ensp;<i class="fa fa-map-marker search-marker"></i><br />' + address[1].trim() + '<br />' + address[2].trim() + '<br />' + sa + '&ensp;<i class="fa fa-map-marker start-marker"></i>'
         : '<b>Click <i class="fa fa-search"></i> below to search for a location</b><br />The map will show areas you can reach from the location using public transport');
     this._div.innerHTML = content.concat('<br /><a href="https://github.com/pbarber/ni-travel-app/blob/main/README.md">More information</a>')
 };
