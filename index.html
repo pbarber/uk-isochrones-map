@@ -1,8 +1,10 @@
 <html>
   <head>
+    <title>NI Public Transport Isochrones</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
     <!-- leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- deck.gl standalone bundle -->
@@ -159,7 +161,7 @@ info.onAdd = function (map) {
 info.update = function (address, sa) {
     this._div.innerHTML = (sa ?
         '<b>' + address[0] + '</b><br />' + address[1] + '<br />' + address[2] + '<br />' + sa
-        : 'Search for a location in NI');
+        : '<b>Click <i class="fa fa-search"></i> below to search for a location</b><br />The map will show areas you can reach from the location using public transport<br /><a href="https://github.com/pbarber/ni-travel-app/blob/main/README.md">More information</a>');
 };
 
 info.addTo(map);
