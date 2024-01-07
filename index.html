@@ -113,9 +113,11 @@ const map = L.map(
   }
 );
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-}).addTo(map);
+})
+
+basemap.addTo(map);
 
 // Colours taken from MetColorBrewer Tam (colourblind safe)
 const opacity = 150;
@@ -169,6 +171,7 @@ map.zoomControl.setPosition('topright');
 
 const featureGroup = L.featureGroup();
 const marker = L.marker([0, 0]);
+var basemapOpacity = 1;
 featureGroup.addLayer(marker);
 var greenIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -178,7 +181,14 @@ var greenIcon = new L.Icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
-const marker2 = L.marker([0, 0], {icon: greenIcon});
+const marker2 = L.marker([0, 0], {icon: greenIcon}).on('click', function(e) {
+  if (basemapOpacity==1) {
+    basemapOpacity = 0.2;
+  } else {
+    basemapOpacity = 1;
+  }
+  basemap.setOpacity(basemapOpacity);
+});
 featureGroup.addLayer(marker2);
 map.addLayer(featureGroup);
 
