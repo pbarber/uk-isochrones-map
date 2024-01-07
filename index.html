@@ -183,9 +183,10 @@ info.onAdd = function (map) {
 
 // method that we will use to update the control based on feature properties passed
 info.update = function (address, sa) {
-    this._div.innerHTML = (sa ?
+    var content = (sa ?
         '<b>' + address[0].trim() + '</b>&ensp;<i class="fa fa-map-marker"></i><br />' + address[1].trim() + '<br />' + address[2].trim() + '<br />' + sa
-        : '<b>Click <i class="fa fa-search"></i> below to search for a location</b><br />The map will show areas you can reach from the location using public transport<br /><a href="https://github.com/pbarber/ni-travel-app/blob/main/README.md">More information</a>');
+        : '<b>Click <i class="fa fa-search"></i> below to search for a location</b><br />The map will show areas you can reach from the location using public transport');
+    this._div.innerHTML = content.concat('<br /><a href="https://github.com/pbarber/ni-travel-app/blob/main/README.md">More information</a>')
 };
 
 info.addTo(map);
@@ -215,6 +216,7 @@ L.Control.geocoder({
           });
           console.log(out.features[0].properties);
           marker2.setLatLng([out.features[0].properties.iso_centre_Y, out.features[0].properties.iso_centre_X]);
+          map.setView([out.features[0].properties.iso_centre_Y, out.features[0].properties.iso_centre_X]);
         });
         throw BreakException;
       }
