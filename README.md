@@ -2,12 +2,24 @@
 
 A [searchable map of NI](https://pbarber.github.io/ni-travel-app) showing areas that can be reached from different locations using public transport within 15/30/45/60 minutes.
 
+The map shows two markers:
+
+* blue: the location that you searched for
+* green: the starting location for the travel areas displayed
+
+The travel areas are limited to 4537 starting locations (green markers). In rural areas the starting locations are sparsely located. The travel areas do not always appear to make logical sense, e.g.:
+
+* searching for Belfast International Airport will provide a starting location at the 'wrong' side of the runway
+* searching for Rowallane will use a starting location south of Saintfield, rather than in the centre of Saintfield
+
+You may get better results by searching for locations on the opposite side of your initial search from the green marker.
+
 ## Datasets
 
 The app makes use of two open datasets:
 
-* Isochrones: the boundaries of the areas that can be reached using public transport from each Small Area in NI
-* Small Area Boundaries: the boundaries of Small Areas in NI
+* [UK Travel Area Isochrones (Nov/Dec 2022) by Public Transport and Walking for Northern Ireland - Generalised to 10m](https://geoportal.statistics.gov.uk/datasets/7f1c281b2561483891cd797b0f6fd463/explore): the boundaries of the areas that can be reached using public transport from each Small Area in NI
+* [NISRA Small Area Boundaries dataset](https://admin.opendatani.gov.uk/dataset/nisra-open-data-boundaries-small-areas-2011): the boundaries of Small Areas in NI
 
 It also uses [OpenStreetMap](https://www.openstreetmap.org/)/[Nominatim](https://wiki.openstreetmap.org/wiki/Nominatim) to provide the search results.
 
