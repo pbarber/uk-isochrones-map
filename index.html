@@ -124,7 +124,7 @@ function loadJson(url, callback) {
 
 // Function to load the first JSON data when the page loads
 window.onload = function() {
-    loadJson('sa2011_epsg4326_simplified15.json', function(data) {
+    loadJson('https://ni-travel-isochrones.s3.eu-west-2.amazonaws.com/sa2011_epsg4326_simplified15.json', function(data) {
         sa2011 = L.geoJSON(data);
     });
 };
