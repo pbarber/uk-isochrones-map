@@ -202,7 +202,12 @@ info.addTo(map);
 
 L.Control.geocoder({
     defaultMarkGeocode: false,
-    position: 'topleft'
+    position: 'topleft',
+    geocoder: new L.Control.Geocoder.Nominatim({
+        geocodingQueryParams: {
+            "viewbox": "-5.4039,55.3166,-8.1738,54.0183"
+        }
+    })
   })
   .on('markgeocode', function(e) {
     var BreakException = {};
