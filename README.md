@@ -5,7 +5,7 @@ A [searchable map of NI](https://pbarber.github.io/ni-travel-app) showing areas 
 The map shows two markers:
 
 * blue: the location that you searched for
-* green: the starting location for the travel areas displayed
+* green: the starting location for the travel areas displayed, click the marker to change the opacity of the underlying map
 
 The travel areas are limited to 4537 starting locations (green markers). In rural areas the starting locations are sparsely located. The travel areas do not always appear to make logical sense, e.g.:
 
