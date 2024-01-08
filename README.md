@@ -55,9 +55,7 @@ To run the app, open [index.html](index.html) in a web browser. The app consists
 
 Key JavaScript libraries used are:
 
-* [Leaflet](https://leafletjs.com/) - for the base map, markers, zoom
-* [Deck.gl](https://deck.gl/) - for the coloured isochrone overlay
-* [Deck.gl-Leaflet](https://github.com/zakjan/deck.gl-leaflet) - to combine the overlay and the map
+* [Leaflet](https://leafletjs.com/) - for the base map, markers, zoom and isochrones
 * [Leaflet Control Geocoder](https://github.com/perliedman/leaflet-control-geocoder) - for the search box and results
 * [Leaflet.PointInPolygon](https://github.com/hayeswise/Leaflet.PointInPolygon) - to find the searched point's isochrone
 

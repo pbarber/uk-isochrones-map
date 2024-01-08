@@ -7,10 +7,6 @@
     
     <!-- leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- deck.gl standalone bundle -->
-    <script src="https://unpkg.com/deck.gl@^8.8.0/dist.min.js"></script>
-    <!-- deck.gl-leaflet -->
-    <script src="https://unpkg.com/deck.gl-leaflet@1.2.1/dist/deck.gl-leaflet.min.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script src="https://cdn.rawgit.com/hayeswise/Leaflet.PointInPolygon/v1.0.0/wise-leaflet-pip.js"></script>
     <!-- Google tag (gtag.js) -->
@@ -125,7 +121,18 @@ basemap.addTo(map);
 
 // Colours taken from MetColorBrewer Tam (colourblind safe)
 const opacity = 150;
-const colours = {15: [254, 203, 28, opacity], 30: [253, 105, 12, opacity], 45: [191, 0, 23, opacity], 60: [85, 0, 77, opacity]}
+const colours = {15: "rgb(254, 203, 28)", 30: "rgb(253, 105, 12)", 45: "rgb(191, 0, 23)", 60: "rgb(85, 0, 77)"}
+function isochroneGetColor(d) {
+    return colours[d];
+}
+function isochroneStyle(feature) {
+    return {
+        fillColor: isochroneGetColor(feature.properties['Travel Minutes']),
+        weight: 0,
+        opacity: 1,
+        fillOpacity: (opacity/255.0)
+    };
+}
 
 /*Legend specific*/
 var legend = L.control({ position: "bottomleft" });
@@ -160,16 +167,7 @@ window.onload = function() {
     });
 };
 
-const deckLayer = new DeckGlLeaflet.LeafletLayer({
-    views: [
-        new deck.MapView({
-        repeat: true
-        })
-    ],
-    layers: [],
-    });
-
-map.addLayer(deckLayer);
+let geojson = null;
 
 map.zoomControl.setPosition('topright');
 
@@ -232,16 +230,10 @@ L.Control.geocoder({
         marker.setLatLng(e.geocode.center);
         loadJson('https://ni-travel-isochrones.s3.eu-west-2.amazonaws.com/'.concat(memberLayer.feature.properties.SA2011, '.geojson'), function(out) {
           out.features.sort((a,b) => b.properties['Travel Minutes'] - a.properties['Travel Minutes']);
-          deckLayer.setProps({layers: [
-              new deck.GeoJsonLayer({
-                  id: 'isochrones',
-                  data: out,
-                  // Styles
-                  filled: true,
-                  getFillColor: f => colours[f.properties['Travel Minutes']]
-              }),
-          ],
-          });
+          if (geojson) {
+            map.removeLayer(geojson);
+          }
+          geojson = L.geoJson(out, {style: isochroneStyle}).addTo(map);
           console.log(out.features[0].properties);
           marker2.setLatLng([out.features[0].properties.iso_centre_Y, out.features[0].properties.iso_centre_X]);
           map.setView([out.features[0].properties.iso_centre_Y, out.features[0].properties.iso_centre_X]);
