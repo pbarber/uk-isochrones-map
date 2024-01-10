@@ -7,6 +7,8 @@ The map shows two markers:
 * blue: the location that you searched for
 * green: the starting location for the travel areas displayed, click the marker to change the opacity of the underlying map
 
+To hide/show different travel times, click the coloured box in the map legend.
+
 The travel areas are limited to 4537 starting locations (green markers). In rural areas the starting locations are sparsely located. The travel areas do not always appear to make logical sense, e.g.:
 
 * searching for Belfast International Airport will provide a starting location at the 'wrong' side of the runway
