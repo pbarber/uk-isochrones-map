@@ -125,25 +125,56 @@ const colours = {15: "rgb(254, 203, 28)", 30: "rgb(253, 105, 12)", 45: "rgb(191,
 function isochroneGetColor(d) {
     return colours[d];
 }
+const opacities = {15: (opacity/255.0), 30: (opacity/255.0), 45: (opacity/255.0), 60: (opacity/255.0)}
+function isochroneGetOpacity(d) {
+    return opacities[d];
+}
 function isochroneStyle(feature) {
     return {
         fillColor: isochroneGetColor(feature.properties['Travel Minutes']),
         weight: 0,
         opacity: 1,
-        fillOpacity: (opacity/255.0)
+        fillOpacity: isochroneGetOpacity(feature.properties['Travel Minutes'])
     };
 }
 
 /*Legend specific*/
 var legend = L.control({ position: "bottomleft" });
 
+function legendClicked(element, num) {
+  if (geojson) {
+    is = element.parentNode.getElementsByTagName('i');
+    let curr = 0
+    if (num < 60) {
+      curr = opacities[num+15]
+    }
+    for (let n=0; n<=3; n++) {
+      let mins = (n+1)*15;
+      if (mins <= num) {
+        opacities[mins] = (opacity/255.0);
+        is[n].style.opacity = (opacity/255.0);
+      } else {
+        if (curr == 0) {
+          opacities[mins] = (opacity/255.0);
+          is[n].style.opacity = (opacity/255.0);
+        } else {
+          opacities[mins] = 0;
+          is[n].style.opacity = 0.2;
+        }
+      }
+    }
+    map.removeLayer(geojson);
+    geojson = L.geoJson(isochrones, {style: isochroneStyle}).addTo(map);
+  }
+}
+
 legend.onAdd = function(map) {
   var div = L.DomUtil.create("div", "legend");
   div.innerHTML += "<h4>Area accessible in:</h4>";
-  div.innerHTML += '<i style="background: '.concat(colours['15'], '"></i><span>15 minutes</span><br>');
-  div.innerHTML += '<i style="background: '.concat(colours['30'], '"></i><span>30 minutes</span><br>');
-  div.innerHTML += '<i style="background: '.concat(colours['45'], '"></i><span>45 minutes</span><br>');;
-  div.innerHTML += '<i style="background: '.concat(colours['60'], '"></i><span>60 minutes</span><br>');;
+  div.innerHTML += '<i onclick="legendClicked(this, 15)" style="background: '.concat(colours['15'], '"></i><span>15 minutes</span><br>');
+  div.innerHTML += '<i onclick="legendClicked(this, 30)" style="background: '.concat(colours['30'], '"></i><span>30 minutes</span><br>');
+  div.innerHTML += '<i onclick="legendClicked(this, 45)" style="background: '.concat(colours['45'], '"></i><span>45 minutes</span><br>');;
+  div.innerHTML += '<i onclick="legendClicked(this, 60)" style="background: '.concat(colours['60'], '"></i><span>60 minutes</span><br>');;
 
   return div;
 };
@@ -168,6 +199,7 @@ window.onload = function() {
 };
 
 let geojson = null;
+let isochrones = null;
 
 map.zoomControl.setPosition('topright');
 
@@ -237,6 +269,7 @@ L.Control.geocoder({
           console.log(out.features[0].properties);
           marker2.setLatLng([out.features[0].properties.iso_centre_Y, out.features[0].properties.iso_centre_X]);
           map.setView([out.features[0].properties.iso_centre_Y, out.features[0].properties.iso_centre_X]);
+          isochrones = out;
         });
         throw BreakException;
       }
