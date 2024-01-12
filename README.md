@@ -7,7 +7,9 @@ The map shows two markers:
 * blue: the location that you searched for
 * green: the starting location for the travel areas displayed, click the marker to change the opacity of the underlying map
 
-To hide/show different travel times, click the coloured box in the map legend.
+To hide/show different travel times, click the coloured box in the map legend. 
+
+The map for each starting location can be shared using the share button, for example the map for [Omagh](https://pbarber.github.io/ni-travel-app?sa=N00004361).
 
 The travel areas are limited to 4537 starting locations (green markers). In rural areas the starting locations are sparsely located. The travel areas do not always appear to make logical sense, e.g.:
 
