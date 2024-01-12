@@ -27,6 +27,10 @@ The app makes use of two open datasets:
 
 It also uses [OpenStreetMap](https://www.openstreetmap.org/)/[Nominatim](https://wiki.openstreetmap.org/wiki/Nominatim) to provide the search results.
 
+## Technical details
+
+Don't read any further unless you really want to.
+
 ### Isochrones
 
 The data used in the app comes from [here](https://geoportal.statistics.gov.uk/datasets/7f1c281b2561483891cd797b0f6fd463/explore), and contains four entries for each Small Area (`SA2011`) in NI (4537 Small Areas), on date 2022-12-06. The four entries have `iso_cutoff` of 900, 1800, 2700 and 3600.
@@ -53,9 +57,9 @@ To understand the Small Areas, I used [the NISRA Small Area Boundaries dataset](
 
 To use the Small Areas dataset in the app, I applied the conversion above in mapshaper, then simplified the file to 15% of the original.
 
-## App
+### App setup
 
-To run the app, open [index.html](index.html) in a web browser. The app consists of a single HTML file and uses JavaScript.
+To run the app, clone the github repo and open [index.html](index.html) in a web browser. The app consists of a single HTML file and uses JavaScript.
 
 Key JavaScript libraries used are:
 
@@ -63,7 +67,7 @@ Key JavaScript libraries used are:
 * [Leaflet Control Geocoder](https://github.com/perliedman/leaflet-control-geocoder) - for the search box and results
 * [Leaflet.PointInPolygon](https://github.com/hayeswise/Leaflet.PointInPolygon) - to find the searched point's isochrone
 
-## Python setup
+### Python setup
 
 To create the map file, use the following.
 
