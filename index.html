@@ -58,7 +58,7 @@ html, body, #map {
 .legend h4 {
   text-align: left;
   font-size: 16px;
-  margin: 2px 12px 8px;
+  margin: 4px 0px;
   color: #777;
 }
 
@@ -87,6 +87,8 @@ html, body, #map {
     background: rgba(255,255,255,0.8);
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     border-radius: 5px;
+    min-width: 225px;
+    max-width: 300px;
 }
 
 .search-marker {
@@ -256,7 +258,7 @@ info.update = function (address, sa) {
         (address.length > 1 ? address[1].trim() + '<br />' : '') +
         (address.length > 2 ? address[2].trim() + '<br />' : '') +
         (sa ? sa + '&ensp;<i class="fa fa-map-marker start-marker"></i><br />' : '') +
-        '<a href="https://github.com/pbarber/ni-travel-app/blob/main/README.md">More information</a><br />' +
+        '<a href="https://github.com/pbarber/ni-travel-app/blob/main/README.md">More information</a>' +
         (sa ? '<span style="float:right;"><button class="btn" onclick=\'copyClicked(\"' + url + '\")\'><i class="fa fa-copy"></i>&ensp;<b>Copy link</b></button></span>' : '')
         );
 };
