@@ -307,7 +307,7 @@ L.Control.geocoder({
     } catch (ex) {
       if (ex !== BreakException) throw ex;
     }
-    gtag('event', 'page_view', {
+    gtag('event', 'search', {
         'page_title' : 'search',
         'page_path': '/search?s=' + encodeURI(e.sourceTarget._lastGeocode) +
           '&lat=' + encodeURI(e.geocode.center.lat) +
