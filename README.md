@@ -18,6 +18,10 @@ The travel areas are limited to 4537 starting locations (green markers). In rura
 
 You may get better results by searching for locations on the opposite side of your initial search from the green marker.
 
+## Privacy
+
+The app uses Google Analytics to measure usage and to capture search and starting locations.
+
 ## Datasets
 
 The app makes use of two open datasets:

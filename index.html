@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    
+
     <!-- leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
@@ -108,7 +108,7 @@ html, body, #map {
   <script type="text/javascript">
 
 const map = L.map(
-  document.getElementById('map'), 
+  document.getElementById('map'),
   {
     center: [54.6, -6.5],
     zoom: 9,
@@ -254,7 +254,7 @@ info.onAdd = function (map) {
 info.update = function (address, sa) {
     var url = location.protocol + '//' + location.host + location.pathname + '?sa=' + (sa ? sa : '');
     this._div.innerHTML = (
-        (address.length > 0 ? '<b>' + address[0].trim() + '</b>&ensp;<i class="fa fa-map-marker search-marker"></i><br />' : '<b>Click <i class="fa fa-search"></i> below to search for a location</b><br />The map will show areas you can reach from the location using public transport<br />') + 
+        (address.length > 0 ? '<b>' + address[0].trim() + '</b>&ensp;<i class="fa fa-map-marker search-marker"></i><br />' : '<b>Click <i class="fa fa-search"></i> below to search for a location</b><br />The map will show areas you can reach from the location using public transport<br />') +
         (address.length > 1 ? address[1].trim() + '<br />' : '') +
         (address.length > 2 ? address[2].trim() + '<br />' : '') +
         (sa ? sa + '&ensp;<i class="fa fa-map-marker start-marker"></i><br />' : '') +
@@ -293,18 +293,27 @@ L.Control.geocoder({
   })
   .on('markgeocode', function(e) {
     var BreakException = {};
+    var sa = null;
     try {
       sa2011.eachLayer(function(memberLayer) {
       if (memberLayer.contains(e.geocode.center)) {
-        info.update(e.geocode.name.split(','), memberLayer.feature.properties.SA2011);
+        sa = memberLayer.feature.properties.SA2011;
+        info.update(e.geocode.name.split(','), sa);
         marker.setLatLng(e.geocode.center);
-        displayIsochrone(memberLayer.feature.properties.SA2011);
+        displayIsochrone(sa);
         throw BreakException;
       }
     });
     } catch (ex) {
       if (ex !== BreakException) throw ex;
     }
+    gtag('config', 'G-870K05D4DG', {
+        'page_title' : 'search',
+        'page_path': '/search?s=' + encodeURI(e.sourceTarget._lastGeocode) +
+          '&lat=' + encodeURI(e.geocode.center.lat) +
+          '&lon=' + encodeURI(e.geocode.center.lat) +
+          '&t=' + sa
+    });
   })
   .addTo(map);
 
