@@ -44,33 +44,39 @@ for sa in reduced['SA2011'].unique():
     min15 = original.loc[lambda df: df['Travel Minutes'] == 15, :]
     pandas.concat([min60, min45, min30, min15]).to_file(f'{sa}.geojson', driver='GeoJSON')
 
-# %%
+# %% Create a Small Area connectivity lookup
 # Load the Small Areas boundaries, preconverted to match geometries
 sa2011 = geopandas.read_file('sa2011_epsg4326_simplified15.json')
 
 # Find all SAs that are accessible from each SA
 joined = df.sjoin(sa2011, how='inner', predicate='intersects',lsuffix='from',rsuffix='to')[['SA2011_from','SA2011_to','Travel Minutes']]
 
-# %%
 # Get the Small Area populations for 2020
 pops = pandas.read_excel('SAPE20-SA-Totals.xlsx', sheet_name='Flat')
 pops = pops[(pops['Area']=='Small Areas') & (pops['Year']==2020)][['Area_Code','MYE']]
 joined = joined.merge(pops, how='inner', left_on='SA2011_from', right_on='Area_Code')
 joined = joined.merge(pops, how='inner', left_on='SA2011_to', right_on='Area_Code', suffixes=['_from','_to'])
+joined.to_csv('sa-connectivity.csv')
 
-# %%
+# %% Get Small Area statistics
+# Load SA NI Multiple Index Of Deprivation data
 nimdm = pandas.read_excel('NIMDM17_SA%20-%20for%20publication.xls', sheet_name='MDM')
 nimdm.columns = nimdm.columns.str.replace(re.compile('\(.+'), '', regex=True).str.replace('\n','').str.strip()
-joined = joined.merge(nimdm, how='left', left_on='SA2011_from', right_on='SA2011').drop(columns=['SA2011'])
 
-# %%
-nimdm = pandas.read_excel('NIMDM17_SA%20-%20for%20publication.xls', sheet_name='Income')
-nimdm.columns = nimdm.columns.str.replace(re.compile('\(.+'), '', regex=True).str.replace('\n','').str.strip()
-joined = joined.merge(nimdm[['SA2011','Proportion of the population living in households whose equivalised income is below 60 per cent of the NI median']], how='left', left_on='SA2011_from', right_on='SA2011').drop(columns=['SA2011'])
+# Load SA NI Multiple Index Of Deprivation income details
+nimdm_income = pandas.read_excel('NIMDM17_SA%20-%20for%20publication.xls', sheet_name='Income')
+nimdm_income.columns = nimdm_income.columns.str.replace(re.compile('\(.+'), '', regex=True).str.replace('\n','').str.strip()
+nimdm = nimdm.merge(nimdm_income[['SA2011','Proportion of the population living in households whose equivalised income is below 60 per cent of the NI median']], how='left', left_on='SA2011', right_on='SA2011')
 
-# %%
-nimdm = pandas.read_excel('NIMDM17_SA%20-%20for%20publication.xls', sheet_name='Employment')
-nimdm.columns = nimdm.columns.str.replace(re.compile('\(.+'), '', regex=True).str.replace('\n','').str.strip()
-joined = joined.merge(nimdm[['SA2011','Proportion of the working age population who are employment deprived']], how='left', left_on='SA2011_from', right_on='SA2011').drop(columns=['SA2011'])
+# Load SA NI Multiple Index Of Deprivation employment details
+nimdm_employment = pandas.read_excel('NIMDM17_SA%20-%20for%20publication.xls', sheet_name='Employment')
+nimdm_employment.columns = nimdm_employment.columns.str.replace(re.compile('\(.+'), '', regex=True).str.replace('\n','').str.strip()
+nimdm = nimdm.merge(nimdm_employment[['SA2011','Proportion of the working age population who are employment deprived']], how='left', left_on='SA2011', right_on='SA2011')
+
+# Load SA NI 2011 Census religion data
+census = pandas.read_excel('census-2011-ks211ni.xlsx', sheet_name='SA', skiprows=5)
+census.drop(columns=['SA','All usual residents'], inplace=True)
+sa_stats = nimdm.merge(census, how='left', left_on='SA2011', right_on='SA Code')
+sa_stats.to_csv('sa-stats.csv')
 
 # %%
