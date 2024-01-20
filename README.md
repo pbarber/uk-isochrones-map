@@ -31,6 +31,13 @@ The app makes use of two open datasets:
 
 It also uses [OpenStreetMap](https://www.openstreetmap.org/)/[Nominatim](https://wiki.openstreetmap.org/wiki/Nominatim) to provide the search results.
 
+## Examples
+
+* [Cookstown](https://pbarber.github.io/ni-travel-app/?sa=N00002130)
+* [Omagh](https://pbarber.github.io/ni-travel-app/?sa=N00004361)
+* [Dundonald](https://pbarber.github.io/ni-travel-app/?sa=N00001821)
+* [Belfast Great Victoria Street](https://pbarber.github.io/ni-travel-app/?sa=N00001417)
+
 ## Technical details
 
 Don't read any further unless you really want to.
