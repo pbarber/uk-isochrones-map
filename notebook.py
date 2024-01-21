@@ -38,6 +38,32 @@ def download_isochrone(hash, area):
     download_file_if_not_exists(url, fname)
     return fname
 
+def load_gdf_and_fix_coords(area, fname):
+    if not os.path.isfile(fname):
+        raise Exception(f'Source file {fname} missing')        
+    # Load the file into a dataframe
+    gdf = geopandas.read_file(fname)
+    # Convert the X/Y coordinates to the coordinate system we will use for mapping
+    if area=='Northern Ireland':
+        coordproj = "EPSG:29902"
+    else:
+        coordproj = "EPSG:27700"
+    trans = Transformer.from_crs(coordproj, "EPSG:4326", always_xy=True)
+    for pre in ['centre', 'node', 'stop']:
+        gdf[f'{pre}_X'], gdf[f'{pre}_Y'] = trans.transform(gdf[f'{pre}_X'].values, gdf[f'{pre}_Y'].values)
+    # Create new columns for the displayed isochrone centre point
+    gdf['iso_centre_X'] = gdf.apply(get_iso_centre, axis=1, dim='X')
+    gdf['iso_centre_Y'] = gdf.apply(get_iso_centre, axis=1, dim='Y')
+    # Identify which area type is being used
+    areatype = None
+    for a in ['SA2011','OA21CD','OA11CD']:
+        if a in gdf.columns:
+            areatype = a
+            break
+    else:
+        raise Exception(f'Unable to find expected area type in {area}')
+    return gdf, areatype
+
 # %% Define isochrone downloads
 isochrones = {
     'London West': {'id': 'bc8991d1c01a4ae4966d9d69498d79b0'},
@@ -69,34 +95,12 @@ for area in isochrones.keys():
 
 # %% Process the files, making a geojson file for each isochrone starting point
 for area in isochrones.keys():
-    print(f'Processing data for {area}')
+    print(f'Creating individual small area files for {area}')
     if not os.path.exists(area):
         os.mkdir(area)
-    if not os.path.isfile(isochrones[area]['fname']):
-        raise Exception(f'Source file {isochrones[area]['fname']} missing')        
-    # Load the file into a dataframe
-    gdf = geopandas.read_file(isochrones[area]['fname'])
-    # Convert the X/Y coordinates to the coordinate system we will use for mapping
-    if area=='Northern Ireland':
-        coordproj = "EPSG:29902"
-    else:
-        coordproj = "EPSG:27700"
-    trans = Transformer.from_crs(coordproj, "EPSG:4326", always_xy=True)
-    for pre in ['centre', 'node', 'stop']:
-        gdf[f'{pre}_X'], gdf[f'{pre}_Y'] = trans.transform(gdf[f'{pre}_X'].values, gdf[f'{pre}_Y'].values)
-    # Create new columns for the displayed isochrone centre point
-    gdf['iso_centre_X'] = gdf.apply(get_iso_centre, axis=1, dim='X')
-    gdf['iso_centre_Y'] = gdf.apply(get_iso_centre, axis=1, dim='Y')
+    gdf, areatype = load_gdf_and_fix_coords(area, isochrones[area]['fname'])
     # Convert the travel time in seconds to minutes
     gdf['Travel Minutes'] = pandas.to_numeric(gdf['iso_cutoff'] / 60, downcast='integer')
-    # Identify which area type is being used
-    areatype = None
-    for a in ['SA2011','OA21CD','OA11CD']:
-        if a in gdf.columns:
-            areatype = a
-            break
-    else:
-        raise Exception(f'Unable to find expected area type in {area}')
     # Reduce down the size of the dataframe and then split by Small Area to minimise data accesses from the app
     reduced = gdf[[areatype,'iso_type','Travel Minutes','iso_centre_X','iso_centre_Y', 'geometry']]
     for sa in reduced[areatype].unique():
@@ -107,8 +111,16 @@ for area in isochrones.keys():
         min15 = original.loc[lambda df: df['Travel Minutes'] == 15, :]
         pandas.concat([min60, min45, min30, min15]).to_file(f'{area}/{sa}.geojson', driver='GeoJSON')
 
+# %% Process the files, making a single JSON file for the UK containing every isochrone starting point
+allareas = pandas.DataFrame()
+for area in isochrones.keys():
+    print(f'Getting isochrone centre data for {area}')
+    gdf, areatype = load_gdf_and_fix_coords(area, isochrones[area]['fname'])
+    allareas = pandas.concat([allareas, gdf[[areatype,'iso_centre_X','iso_centre_Y']].drop_duplicates()])
+allareas.to_json('all-area-centres.json', orient='records')
+
 # %% Create a Small Area connectivity lookup for NI
-gdf = geopandas.read_file(isochrones['Northern Ireland']['fname'])
+gdf, _ = load_gdf_and_fix_coords('Northern Ireland', isochrones['Northern Ireland']['fname'])
 
 # Load the Small Areas boundaries, preconverted to match geometries
 sa2011 = geopandas.read_file('sa2011_epsg4326_simplified15.json')
