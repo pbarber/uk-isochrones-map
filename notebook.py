@@ -85,16 +85,13 @@ isochrones = {
     'West Scotland South': {'id': 'd1950a7db27d4b91b99748ad3924f472'},
 }
 
-# %% Get isochrones files
+# %% Process the files, making a geojson file for each isochrone starting point
 for area in isochrones.keys():
     print(f'Downloading file for {area}')
     # Get the data in EPSG:4326 so that we don't have to apply any conversion.
     # The geopandas CRS conversion from the website downloaded format of 27700 for NI is 
     # slightly offset, this avoids the offset
     isochrones[area]['fname'] = download_isochrone(isochrones[area]['id'], area)
-
-# %% Process the files, making a geojson file for each isochrone starting point
-for area in isochrones.keys():
     print(f'Creating individual small area files for {area}')
     if not os.path.exists(area):
         os.mkdir(area)
@@ -114,10 +111,21 @@ for area in isochrones.keys():
 # %% Process the files, making a single JSON file for the UK containing every isochrone starting point
 allareas = pandas.DataFrame()
 for area in isochrones.keys():
+    print(f'Downloading file for {area}')
+    # Get the data in EPSG:4326 so that we don't have to apply any conversion.
+    # The geopandas CRS conversion from the website downloaded format of 27700 for NI is 
+    # slightly offset, this avoids the offset
+    isochrones[area]['fname'] = download_isochrone(isochrones[area]['id'], area)
     print(f'Getting isochrone centre data for {area}')
     gdf, areatype = load_gdf_and_fix_coords(area, isochrones[area]['fname'])
     allareas = pandas.concat([allareas, gdf[[areatype,'iso_centre_X','iso_centre_Y']].drop_duplicates()])
-allareas.to_json('all-area-centres.json', orient='records')
+allareas.reset_index(inplace=True)
+allareas['areaname'] = allareas.OA21CD.combine_first(allareas.SA2011).combine_first(allareas.OA11CD)
+allareas = allareas[['areaname','iso_centre_X','iso_centre_Y']]
+allareasgdf = geopandas.GeoDataFrame(
+    allareas, geometry=geopandas.points_from_xy(allareas.iso_centre_X, allareas.iso_centre_Y), crs="EPSG:4326"
+)[['areaname','geometry']]
+allareasgdf.to_file('all-area-centres.geojson', driver='GeoJSON')
 
 # %% Create a Small Area connectivity lookup for NI
 gdf, _ = load_gdf_and_fix_coords('Northern Ireland', isochrones['Northern Ireland']['fname'])
