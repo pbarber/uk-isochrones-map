@@ -3,3 +3,4 @@
 *.xls*
 *.csv
 *.gdb.zip
+.DS_Store
