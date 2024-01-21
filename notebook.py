@@ -107,12 +107,14 @@ for area in isochrones.keys():
         min15 = original.loc[lambda df: df['Travel Minutes'] == 15, :]
         pandas.concat([min60, min45, min30, min15]).to_file(f'{area}/{sa}.geojson', driver='GeoJSON')
 
-# %% Create a Small Area connectivity lookup
+# %% Create a Small Area connectivity lookup for NI
+gdf = geopandas.read_file(isochrones['Northern Ireland']['fname'])
+
 # Load the Small Areas boundaries, preconverted to match geometries
 sa2011 = geopandas.read_file('sa2011_epsg4326_simplified15.json')
 
 # Find all SAs that are accessible from each SA
-joined = df.sjoin(sa2011, how='inner', predicate='intersects',lsuffix='from',rsuffix='to')[['SA2011_from','SA2011_to','Travel Minutes']]
+joined = gdf.sjoin(sa2011, how='inner', predicate='intersects',lsuffix='from',rsuffix='to')[['SA2011_from','SA2011_to','Travel Minutes']]
 
 # Get the Small Area populations for 2020
 pops = pandas.read_excel('SAPE20-SA-Totals.xlsx', sheet_name='Flat')
