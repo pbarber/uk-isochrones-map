@@ -304,8 +304,8 @@ L.Control.geocoder({
     var BreakException = {};
     var sa = null;
     var search = new L.latLng(e.geocode.center.lat, e.geocode.center.lng);
-    found = searchTree.nearest(search, 1);
-    if (found) {
+    found = searchTree.nearest(search, 1, 20000);
+    if (found && (found.length > 0)) {
       sa = found[0][0].areaname;
       info.update(e.geocode.name.split(','), sa);
       marker.setLatLng(e.geocode.center);
