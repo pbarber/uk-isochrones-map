@@ -9,6 +9,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script src="https://cdn.rawgit.com/hayeswise/Leaflet.PointInPolygon/v1.0.0/wise-leaflet-pip.js"></script>
+    <!-- kd-tree -->
+    <script src="https://unpkg.com/kd-tree-javascript@1.0.3/kdTree-min.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-870K05D4DG"></script>
     <script>
@@ -183,7 +185,8 @@ legend.onAdd = function(map) {
 
 legend.addTo(map);
 
-let sa2011 = null;
+let areas = null;
+let searchTree = null;
 
 // Function to load JSON data from a URL
 function loadJson(url, callback) {
@@ -193,16 +196,21 @@ function loadJson(url, callback) {
         .catch(error => console.error('Error loading JSON:', error));
 }
 
+function distance(a, b) {
+  return (L.latLng(a.lat, a.lng).distanceTo(L.latLng(b.lat, b.lng)));
+}
+
 // Function to load the first JSON data when the page loads
 window.onload = function() {
-    loadJson('https://ni-travel-isochrones.s3.eu-west-2.amazonaws.com/sa2011_epsg4326_simplified15.json', function(data) {
-        sa2011 = L.geoJSON(data);
+    loadJson('https://ni-travel-isochrones.s3.eu-west-2.amazonaws.com/all-area-centres.geojson', function(data) {
+        areas = L.geoJSON(data);
+        searchTree = new kdTree(Object.values(areas._layers).map( function(v) { return {lat: v._latlng.lat,lng: v._latlng.lng, areaname: v.feature.properties.areaname }}), distance, ["lat","lng"]);
         const searchParam = new URLSearchParams(location.search).get('sa');
         if (searchParam) {
           try {
             var BreakException = {};
-            sa2011.eachLayer(function(memberLayer) {
-              if (memberLayer.feature.properties.SA2011 == searchParam) {
+            areas.eachLayer(function(memberLayer) {
+              if (memberLayer.feature.properties.areaname == searchParam) {
                 info.update([], searchParam);
                 displayIsochrone(searchParam);
               }
@@ -287,31 +295,27 @@ L.Control.geocoder({
     position: 'topleft',
     geocoder: new L.Control.Geocoder.Nominatim({
         geocodingQueryParams: {
-            "viewbox": "2.01,61.01,-9.0,49.75"
+            "bounded": 1,
+            "viewbox": "-9.0,49.75,2.01,61.01"
         }
     })
   })
   .on('markgeocode', function(e) {
     var BreakException = {};
     var sa = null;
-    try {
-      sa2011.eachLayer(function(memberLayer) {
-      if (memberLayer.contains(e.geocode.center)) {
-        sa = memberLayer.feature.properties.SA2011;
-        info.update(e.geocode.name.split(','), sa);
-        marker.setLatLng(e.geocode.center);
-        displayIsochrone(sa);
-        throw BreakException;
-      }
-    });
-    } catch (ex) {
-      if (ex !== BreakException) throw ex;
+    var search = new L.latLng(e.geocode.center.lat, e.geocode.center.lng);
+    found = searchTree.nearest(search, 1);
+    if (found) {
+      sa = found[0][0].areaname;
+      info.update(e.geocode.name.split(','), sa);
+      marker.setLatLng(e.geocode.center);
+      displayIsochrone(sa);
     }
     gtag('event', 'search', {
         'page_title' : 'search',
         'page_path': '/search?s=' + encodeURI(e.sourceTarget._lastGeocode) +
           '&lat=' + encodeURI(e.geocode.center.lat) +
-          '&lon=' + encodeURI(e.geocode.center.lat) +
+          '&lon=' + encodeURI(e.geocode.center.ln) +
           '&t=' + sa,
         'send_to': 'G-870K05D4DG'
     });
