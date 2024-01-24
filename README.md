@@ -18,7 +18,7 @@ For NI, where the map was initially developed, the travel areas are limited to 4
 
 You may get better results by searching for locations on the opposite side of your initial search from the green marker.
 
-If you like the map and can afford it, please [donate to Action Cancer]() or [buy me a coffee]().
+If you like the map and can afford it, please [donate to Action Cancer](https://actioncancer.org/donate-to-action-cancer/) or [buy me a coffee](https://www.buymeacoffee.com/pbarber).
 
 ## Privacy
 
