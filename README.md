@@ -1,6 +1,6 @@
-# NI Travel app
+# UK isochrones map
 
-A [searchable map of NI](https://pbarber.github.io/ni-travel-app) showing areas that can be reached from different locations using public transport within 15/30/45/60 minutes.
+A [searchable map of the UK](https://pbarber.github.io/uk-isochrones-map) showing areas that can be reached from different locations using public transport within 15/30/45/60 minutes.
 
 The map shows two markers:
 
@@ -9,14 +9,16 @@ The map shows two markers:
 
 To hide/show different travel times, click the coloured box in the map legend. 
 
-The map for each starting location can be shared using the share button, for example the map for [Omagh](https://pbarber.github.io/ni-travel-app?sa=N00004361).
+The map for each starting location can be shared using the share button, for example the map for [Omagh](https://pbarber.github.io/uk-isochrones-map?sa=N00004361).
 
-The travel areas are limited to 4537 starting locations (green markers). In rural areas the starting locations are sparsely located. The travel areas do not always appear to make logical sense, e.g.:
+For NI, where the map was initially developed, the travel areas are limited to 4537 starting locations (green markers). In rural areas the starting locations are sparsely located. The travel areas do not always appear to make logical sense, e.g.:
 
 * searching for Belfast International Airport will provide a starting location at the 'wrong' side of the runway
 * searching for Rowallane will use a starting location south of Saintfield, rather than in the centre of Saintfield
 
 You may get better results by searching for locations on the opposite side of your initial search from the green marker.
+
+If you like the map and can afford it, please [donate to Action Cancer]() or [buy me a coffee]().
 
 ## Privacy
 
@@ -24,19 +26,20 @@ The app uses Google Analytics to measure usage and to capture search and startin
 
 ## Datasets
 
-The app makes use of two open datasets:
+The app makes use of a single open dataset which is split by geography:
 
 * [UK Travel Area Isochrones (Nov/Dec 2022) by Public Transport and Walking for Northern Ireland - Generalised to 10m](https://geoportal.statistics.gov.uk/datasets/7f1c281b2561483891cd797b0f6fd463/explore): the boundaries of the areas that can be reached using public transport from each Small Area in NI
-* [NISRA Small Area Boundaries dataset](https://admin.opendatani.gov.uk/dataset/nisra-open-data-boundaries-small-areas-2011): the boundaries of Small Areas in NI
 
 It also uses [OpenStreetMap](https://www.openstreetmap.org/)/[Nominatim](https://wiki.openstreetmap.org/wiki/Nominatim) to provide the search results.
 
 ## Examples
 
-* [Cookstown](https://pbarber.github.io/ni-travel-app/?sa=N00002130)
-* [Omagh](https://pbarber.github.io/ni-travel-app/?sa=N00004361)
-* [Dundonald](https://pbarber.github.io/ni-travel-app/?sa=N00001821)
-* [Belfast Great Victoria Street](https://pbarber.github.io/ni-travel-app/?sa=N00001417)
+* [Cookstown](https://pbarber.github.io/uk-isochrones-app/?sa=N00002130)
+* [Omagh](https://pbarber.github.io/uk-isochrones-app/?sa=N00004361)
+* [Dundonald](https://pbarber.github.io/uk-isochrones-app/?sa=N00001821)
+* [Belfast Great Victoria Street](https://pbarber.github.io/uk-isochrones-app/?sa=N00001417)
+
+![Examples of isochrones for NI](ni-travel-maps.png)
 
 ## Technical details
 
@@ -54,19 +57,9 @@ The meaning of `iso_cutoff` is:
 
 The centre point used is key to plotting on a map, this is defined by `iso_type`. Most values are `from_centroid` but other are used, so this needs to be dynamic. Though, given that the data is at Small Area level, probably just simplest to map Small Area initially.
 
-Whilst the shapes of the areas are in WGS84, the centroid/stop/node coordinates are in Irish Grid.
+Whilst the shapes of the areas are in WGS84, the centroid/stop/node coordinates for NI are in Irish Grid and for the rest of the UK are in OS grid.
 
 I split the isochrones dataset into one file per Small Area, in order to save the app from having to download the whole dataset. This conversion process is handled in [notebook.py](notebook.py). The files are hosted on AWS S3.
-
-### Small Area Boundaries
-
-To understand the Small Areas, I used [the NISRA Small Area Boundaries dataset](https://admin.opendatani.gov.uk/dataset/nisra-open-data-boundaries-small-areas-2011). Note that to use a base map with the GeoJSON in [mapshaper](https://mapshaper.org), you need to run:
-
-```
--proj from=EPSG:29902 crs=EPSG:4326
-```
-
-To use the Small Areas dataset in the app, I applied the conversion above in mapshaper, then simplified the file to 15% of the original.
 
 ### App setup
 
